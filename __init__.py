@@ -1,0 +1,1 @@
+default_app_config = "one_oh_one_core.apps.OneOhOneCoreConfig"

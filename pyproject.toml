@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "one-oh-one-core"
+version = "0.1.0"
+description = "Reusable core platform for Django Ninja projects"
+authors = [
+  { name="Andrew Simpson", email="addehe.d@gmail.com" }
+]
+
+dependencies = [
+  "Django>=5.2",
+  "django-ninja",
+  "django-ninja-extra",
+  "ninja-schema"
+]
+
+requires-python = ">=3.10"
