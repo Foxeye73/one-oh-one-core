@@ -1,4 +1,6 @@
 from typing import Type, Generic, List, TypeVar
+
+from asgiref.sync import sync_to_async
 from django.db import models
 from ninja_extra import route
 from ninja.pagination import paginate
@@ -7,21 +9,25 @@ ModelType = TypeVar("ModelType", bound=models.Model)
 SchemaType = TypeVar("SchemaType")
 CreateSchemaType = TypeVar("CreateSchemaType")
 UpdateSchemaType = TypeVar("UpdateSchemaType")
+ServiceType = TypeVar("ServiceType")
 
 
 class AsyncCRUDController(Generic[ModelType, SchemaType, CreateSchemaType, UpdateSchemaType]):
 
     model: Type[ModelType]
     schema: Type[SchemaType]
+    service: Type[ServiceType] = None
 
     def get_queryset(self):
-        return self.model.objects.all()
+        if self.service is None:
+            return self.model.objects.all()
+        return self.service.get_queryset()
 
     @route.get("/", response=List[SchemaType])
     @paginate
     async def list(self):
         qs = self.get_queryset()
-        return [self.schema.from_orm(obj) async for obj in qs]
+        return [await sync_to_async(self.schema.from_orm)(obj) async for obj in qs]
 
     @route.get("/{obj_id}", response=SchemaType)
     async def retrieve(self, obj_id: int):
